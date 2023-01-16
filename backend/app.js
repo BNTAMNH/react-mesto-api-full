@@ -6,10 +6,11 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
-const NotFoundError = require('./errors/NotFoundError');
 const auth = require('./middlewares/auth');
-const { login, createUser } = require('./controllers/users');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUserValidator, loginValidator } = require('./middlewares/validation');
+const NotFoundError = require('./errors/NotFoundError');
+const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -21,6 +22,8 @@ app.use(rateLimit({
 }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use(requestLogger);
 
 app.post('/signin', loginValidator, login);
 app.post('/signup', createUserValidator, createUser);
@@ -34,6 +37,7 @@ app.use('/*', () => {
   throw new NotFoundError('Запрашиваемая страница не найдена');
 });
 
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 
