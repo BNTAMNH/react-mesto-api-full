@@ -30,42 +30,58 @@ function App() {
   const [email, setEmail] = useState('');
   const history = useHistory();
 
-  useEffect(() => {
-    const jwt = localStorage.getItem('jwt');
-    if (jwt) {
-      apiAuth.checkToken(jwt)
-        .then((res) => {
-          setLoggedIn(true);
-          setEmail(res.data.email);
-          history.push('/');
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-    }
-  }, [history])
+  // useEffect(() => {
+  //   const jwt = localStorage.getItem('jwt');
+  //   if (jwt) {
+  //     apiAuth.checkToken(jwt)
+  //       .then((res) => {
+  //         setLoggedIn(true);
+  //         setEmail(res.data.email);
+  //         history.push('/');
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       })
+  //   }
+  // }, [history])
+
+  // useEffect(() => {
+  //   if (loggedIn) {
+  //     api.getInitialCards()
+  //       .then((initialCards) => {
+  //         setCards(initialCards);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  // }, [loggedIn]); 
+
+  // useEffect(() => {
+  //   api.getUserInfo()
+  //     .then((userData) => {
+  //       setCurrentUser(userData);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
   useEffect(() => {
     if (loggedIn) {
-      api.getInitialCards()
-        .then((initialCards) => {
-          setCards(initialCards);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [loggedIn]); 
-
-  useEffect(() => {
-    api.getUserInfo()
-      .then((userData) => {
+      Promise.all([
+        api.getInitialCards(),
+        api.getUserInfo()
+      ])
+      .then(([initialCards, userData]) => {
+        setCards(initialCards);
         setCurrentUser(userData);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+    }
+  }, [loggedIn, history]);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);

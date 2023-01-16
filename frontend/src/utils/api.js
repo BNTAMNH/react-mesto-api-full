@@ -1,7 +1,6 @@
 class Api {
     constructor(url, token) {
         this._url = url;
-        this._token = token;
     }
 
     _handleResponse(res) {
@@ -15,7 +14,7 @@ class Api {
         return fetch(`${this._url}/cards`, {
         method: 'GET',
         headers: {
-            authorization: this._token
+            authorization: `Bearer ${token}`
         }
         })
         .then(res => this._handleResponse(res))
@@ -25,7 +24,7 @@ class Api {
         return fetch(`${this._url}/users/me`, {
         method: 'GET',
         headers: {
-            authorization: this._token
+            authorization: `Bearer ${token}`
         }
         })
         .then(res => this._handleResponse(res))
@@ -35,7 +34,7 @@ class Api {
         return fetch(`${this._url}/users/me`, {
         method: 'PATCH',
         headers: {
-            authorization: this._token,
+            authorization: `Bearer ${token}`,
             'Content-type': 'application/json'
         },
         body: JSON.stringify(data)
@@ -52,7 +51,7 @@ class Api {
         return fetch(`${this._url}/cards`, {
         method: 'POST',
         headers: {
-            authorization: this._token,
+            authorization: `Bearer ${token}`,
             'Content-type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -64,7 +63,7 @@ class Api {
         return fetch(`${this._url}/cards/${idCard}`, {
         method: 'DELETE',
         headers: {
-            authorization: this._token
+            authorization: `Bearer ${token}`
         }
         })
         .then(res => this._handleResponse(res))
@@ -74,7 +73,7 @@ class Api {
         return fetch(`${this._url}/cards/${idCard}/likes`, {
         method: isLiked ? 'DELETE' : 'PUT',
         headers: {
-            authorization: this._token
+            authorization: `Bearer ${token}`
         }
         })
         .then(res => this._handleResponse(res))
@@ -88,7 +87,7 @@ class Api {
         return fetch(`${this._url}/users/me/avatar`, {
         method: 'PATCH',
         headers: {
-            authorization: this._token,
+            authorization: `Bearer ${token}`,
             'Content-type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -97,8 +96,8 @@ class Api {
     }
 }
 
+let token = localStorage.getItem('jwt');
 const api = new Api(
-    'https://mesto.nomoreparties.co/v1/cohort-43', 
-    '233a8c63-1700-4115-a0b1-8a186f84e03d'
+    'http://localhost:3001'
     );
 export default api;

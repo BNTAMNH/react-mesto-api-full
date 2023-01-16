@@ -3,7 +3,7 @@ import Card from "../components/Card"
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 function Main(props) {
-
+  console.log(props.cards);
   const currentUser = useContext(CurrentUserContext); 
   
   return (
