@@ -1,0 +1,18 @@
+.profile__data {
+  display: grid;
+  gap: 9px 18px;
+  grid-template-areas:
+    "profile_name profile__edit-btn"
+    "profile__about-me profile__about-me";
+  grid-template-rows: max-content max-content;
+  align-content: center;
+}
+
+@media screen and (max-width: 600px) {
+  .profile__data {
+    gap: 7px 12px;
+    grid-template-areas:
+    ". . profile_name profile__edit-btn"
+    ". . profile__about-me profile__about-me";
+  }
+}

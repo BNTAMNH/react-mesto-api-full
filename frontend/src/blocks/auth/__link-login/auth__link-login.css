@@ -1,0 +1,11 @@
+.auth__link-login {
+  padding-left: 6px;
+  text-decoration: none;
+  color: #fff;
+  transition: opacity .4s;
+}
+
+.auth__link-login:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
