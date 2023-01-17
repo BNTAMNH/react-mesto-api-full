@@ -3,7 +3,6 @@ import Card from "../components/Card"
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 function Main(props) {
-  console.log(props.cards);
   const currentUser = useContext(CurrentUserContext); 
   
   return (
@@ -43,7 +42,7 @@ function Main(props) {
       </section>
       <section className="places" aria-label="Место">
         <ul className="places__list">
-          {props.cards.map((item) => {
+          {props.cards.data.map((item) => {
             return (
               <Card 
                 card = {item}

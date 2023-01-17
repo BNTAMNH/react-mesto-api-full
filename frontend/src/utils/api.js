@@ -1,6 +1,12 @@
 class Api {
-    constructor(url, token) {
-        this._url = url;
+    constructor(config) {
+        this._url = config.url;
+        this._headers = config.headers;
+    }
+
+    _getToken() {
+        const token = localStorage.getItem('jwt');
+        return { Authorization: `Bearer ${token}`, ...this._headers };
     }
 
     _handleResponse(res) {
@@ -13,9 +19,7 @@ class Api {
     getInitialCards() {
         return fetch(`${this._url}/cards`, {
         method: 'GET',
-        headers: {
-            authorization: `Bearer ${token}`
-        }
+        headers: this._getToken()
         })
         .then(res => this._handleResponse(res))
     }
@@ -23,9 +27,7 @@ class Api {
     getUserInfo() {
         return fetch(`${this._url}/users/me`, {
         method: 'GET',
-        headers: {
-            authorization: `Bearer ${token}`
-        }
+        headers: this._getToken()
         })
         .then(res => this._handleResponse(res))
     }
@@ -33,10 +35,7 @@ class Api {
     setUserInfo(data) {
         return fetch(`${this._url}/users/me`, {
         method: 'PATCH',
-        headers: {
-            authorization: `Bearer ${token}`,
-            'Content-type': 'application/json'
-        },
+        headers: this._getToken(),
         body: JSON.stringify(data)
         })
         .then(res => this._handleResponse(res))
@@ -50,10 +49,7 @@ class Api {
 
         return fetch(`${this._url}/cards`, {
         method: 'POST',
-        headers: {
-            authorization: `Bearer ${token}`,
-            'Content-type': 'application/json'
-        },
+        headers: this._getToken(),
         body: JSON.stringify(body)
         })
         .then(res => this._handleResponse(res))
@@ -62,9 +58,7 @@ class Api {
     deleteCard(idCard) {
         return fetch(`${this._url}/cards/${idCard}`, {
         method: 'DELETE',
-        headers: {
-            authorization: `Bearer ${token}`
-        }
+        headers: this._getToken()
         })
         .then(res => this._handleResponse(res))
     }
@@ -72,9 +66,7 @@ class Api {
     changeLikeCardStatus(idCard, isLiked) {
         return fetch(`${this._url}/cards/${idCard}/likes`, {
         method: isLiked ? 'DELETE' : 'PUT',
-        headers: {
-            authorization: `Bearer ${token}`
-        }
+        headers: this._getToken()
         })
         .then(res => this._handleResponse(res))
     }
@@ -86,18 +78,18 @@ class Api {
 
         return fetch(`${this._url}/users/me/avatar`, {
         method: 'PATCH',
-        headers: {
-            authorization: `Bearer ${token}`,
-            'Content-type': 'application/json'
-        },
+        headers: this._getToken(),
         body: JSON.stringify(body)
         })
         .then(res => this._handleResponse(res));
     }
 }
 
-let token = localStorage.getItem('jwt');
-const api = new Api(
-    'http://localhost:3001'
-    );
+const api = new Api({
+    url: 'http://localhost:3001',
+    headers: {
+        "Content-type": "application/json"
+    }
+});
+
 export default api;

@@ -30,13 +30,45 @@ function App() {
   const [email, setEmail] = useState('');
   const history = useHistory();
 
+  useEffect(() => {
+    checkToken();
+
+    if (loggedIn) {
+      Promise.all([
+        api.getInitialCards(),
+        api.getUserInfo()
+      ])
+      .then(([initialCards, data]) => {
+        setCards(initialCards);
+        setCurrentUser(data);
+      })
+      .catch((err) => console.log(err));
+    }
+  }, [loggedIn]);
+
+  function checkToken() {
+    const jwt = localStorage.getItem('jwt');
+
+    if (jwt) {
+      apiAuth.checkToken(jwt)
+        .then((res) => {
+          setEmail(res.email);
+          setLoggedIn(true);
+          history.push('/');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
   // useEffect(() => {
   //   const jwt = localStorage.getItem('jwt');
   //   if (jwt) {
   //     apiAuth.checkToken(jwt)
   //       .then((res) => {
+  //         // setEmail(res.data.email);
   //         setLoggedIn(true);
-  //         setEmail(res.data.email);
   //         history.push('/');
   //       })
   //       .catch((err) => {
@@ -58,30 +90,16 @@ function App() {
   // }, [loggedIn]); 
 
   // useEffect(() => {
-  //   api.getUserInfo()
+  //   if (loggedIn) {
+  //     api.getUserInfo()
   //     .then((userData) => {
   //       setCurrentUser(userData);
   //     })
   //     .catch((err) => {
   //       console.log(err);
   //     });
-  // }, []);
-
-  useEffect(() => {
-    if (loggedIn) {
-      Promise.all([
-        api.getInitialCards(),
-        api.getUserInfo()
-      ])
-      .then(([initialCards, userData]) => {
-        setCards(initialCards);
-        setCurrentUser(userData);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    }
-  }, [loggedIn, history]);
+  //   }
+  // }, [loggedIn]);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
