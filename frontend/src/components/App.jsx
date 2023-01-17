@@ -31,9 +31,46 @@ function App() {
   const history = useHistory();
 
   useEffect(() => {
-    checkToken();
+   tokenCheck();
+   console.log(loggedIn);
+  }, []);
 
+  const tokenCheck = () => {
+    // если у пользователя есть токен в localStorage, 
+    // эта функция проверит, действующий он или нет
+    if (localStorage.getItem('jwt')){
+      const jwt = localStorage.getItem('jwt');
+  
+      // здесь будем проверять токен
+      apiAuth.checkToken(jwt)
+        .then((res) => {
+          setLoggedIn(true);
+        })
+        .catch((err) => console.log(err))
+    }
+   }
+  
+  // useEffect(() => {
+  //   const jwt = localStorage.getItem('jwt');
+  //   if (jwt) {
+  //     apiAuth.checkToken(jwt)
+  //       .then((res) => {
+  //         if (res) {
+  //           // setEmail(res.data.email);
+  //           setLoggedIn(true);
+  //           history.push('/');
+  //           return 
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       })
+  //   }
+  // }, [history])
+
+  useEffect(() => {
     if (loggedIn) {
+      console.log(loggedIn);
       Promise.all([
         api.getInitialCards(),
         api.getUserInfo()
@@ -45,37 +82,7 @@ function App() {
       .catch((err) => console.log(err));
     }
   }, [loggedIn]);
-
-  function checkToken() {
-    const jwt = localStorage.getItem('jwt');
-
-    if (jwt) {
-      apiAuth.checkToken(jwt)
-        .then((res) => {
-          setEmail(res.email);
-          setLoggedIn(true);
-          history.push('/');
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }
-
-  // useEffect(() => {
-  //   const jwt = localStorage.getItem('jwt');
-  //   if (jwt) {
-  //     apiAuth.checkToken(jwt)
-  //       .then((res) => {
-  //         // setEmail(res.data.email);
-  //         setLoggedIn(true);
-  //         history.push('/');
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       })
-  //   }
-  // }, [history])
+  console.log(loggedIn);
 
   // useEffect(() => {
   //   if (loggedIn) {
