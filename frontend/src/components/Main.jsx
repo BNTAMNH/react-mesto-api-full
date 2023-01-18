@@ -4,7 +4,6 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 function Main(props) {
   const currentUser = useContext(CurrentUserContext); 
-  console.log(props.cards);
   return (
     <main className="content">
       <section className="profile">
@@ -42,7 +41,7 @@ function Main(props) {
       </section>
       <section className="places" aria-label="Место">
         <ul className="places__list">
-          {props.cards.data.map((item) => {
+          {props.cards.map((item) => {
             return (
               <Card 
                 card = {item}

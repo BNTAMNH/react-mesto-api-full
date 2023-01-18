@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+// const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
 const auth = require('./middlewares/auth');
@@ -18,10 +18,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(helmet());
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-}));
+// app.use(rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+// }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 

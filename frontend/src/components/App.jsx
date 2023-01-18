@@ -18,7 +18,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
 
-  const [currentUser, setCurrentUser] = useState('');
+  const [currentUser, setCurrentUser] = useState({});
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
@@ -29,33 +29,24 @@ function App() {
   const [isSucces, setIsSucces] = useState(false);
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
-
+  
   useEffect(() => {
-    if (loggedIn) {
-      api.getUserInfo()
-        .then((user) => {
-          setCurrentUser(user);
-          setLoggedIn(true);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      api.getInitialCards()
-        .then((cards) => {
-          setCards(cards);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }  
+    navigate('/');
+    // eslint-disable-next-line
   }, [loggedIn]);
 
   useEffect(() => {
     handletokenCheck();
-    setLoggedIn(true);
     // eslint-disable-next-line
    }, []);
+  
+  const initCards = () => {
+    api.getInitialCards()
+      .then((initialCards) => {
+        setCards(initialCards.reverse());
+      })
+      .catch((err) => console.log(err));
+  };
 
   function handletokenCheck() {
     const jwt = localStorage.getItem('jwt');
@@ -63,57 +54,16 @@ function App() {
     if (jwt){
       apiAuth.checkToken(jwt)
         .then((res) => {
-          if (res) {
+          if (res.email) {
             setEmail(res.email);
+            setCurrentUser(res);
             setLoggedIn(true);
-            navigate('/');
+            initCards();
           }
         })
         .catch((err) => console.log(err))
     }
    }
-  
-  // useEffect(() => {
-  //   const jwt = localStorage.getItem('jwt');
-  //   if (jwt) {
-  //     apiAuth.checkToken(jwt)
-  //       .then((res) => {
-  //         if (res) {
-  //           // setEmail(res.data.email);
-  //           setLoggedIn(true);
-  //           history.push('/');
-  //           return 
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       })
-  //   }
-  // }, [history])
-
-  // useEffect(() => {
-  //   if (loggedIn) {
-  //     api.getInitialCards()
-  //       .then((initialCards) => {
-  //         setCards(initialCards);
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       });
-  //   }
-  // }, [loggedIn]); 
-
-  // useEffect(() => {
-  //   if (loggedIn) {
-  //     api.getUserInfo()
-  //     .then((userData) => {
-  //       setCurrentUser(userData);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  //   }
-  // }, [loggedIn]);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
@@ -173,7 +123,7 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i === currentUser._id);
     api.changeLikeCardStatus(card._id, isLiked)
       .then((newCard) => {
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c));

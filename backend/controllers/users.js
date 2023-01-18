@@ -17,12 +17,10 @@ module.exports.createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     }))
     .then(() => res.send({
-      data: {
-        name,
-        about,
-        avatar,
-        email,
-      },
+      name,
+      about,
+      avatar,
+      email,
     }))
     .catch((err) => {
       if (err.code === 11000) {
@@ -68,7 +66,7 @@ module.exports.updateUserInfo = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(new NotFoundError('Пользователь с указанным ID - не найден'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении пользователя'));
@@ -88,7 +86,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(new NotFoundError('Пользователь с указанным ID - не найден'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении пользователя'));
