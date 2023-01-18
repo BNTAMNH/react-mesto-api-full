@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch, Route, Redirect, useHistory } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import api from "../utils/api.js";
 import * as apiAuth from "../utils/apiAuth.js";
 import Footer from "./Footer";
@@ -28,23 +28,46 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isSucces, setIsSucces] = useState(false);
   const [email, setEmail] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
-   tokenCheck();
-   console.log(loggedIn);
-  }, []);
+    if (loggedIn) {
+      api.getUserInfo()
+        .then((user) => {
+          setCurrentUser(user);
+          setLoggedIn(true);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
-  const tokenCheck = () => {
-    // если у пользователя есть токен в localStorage, 
-    // эта функция проверит, действующий он или нет
-    if (localStorage.getItem('jwt')){
-      const jwt = localStorage.getItem('jwt');
-  
-      // здесь будем проверять токен
+      api.getInitialCards()
+        .then((cards) => {
+          setCards(cards);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }  
+  }, [loggedIn]);
+
+  useEffect(() => {
+    handletokenCheck();
+    setLoggedIn(true);
+    // eslint-disable-next-line
+   }, []);
+
+  function handletokenCheck() {
+    const jwt = localStorage.getItem('jwt');
+
+    if (jwt){
       apiAuth.checkToken(jwt)
         .then((res) => {
-          setLoggedIn(true);
+          if (res) {
+            setEmail(res.email);
+            setLoggedIn(true);
+            navigate('/');
+          }
         })
         .catch((err) => console.log(err))
     }
@@ -67,22 +90,6 @@ function App() {
   //       })
   //   }
   // }, [history])
-
-  useEffect(() => {
-    if (loggedIn) {
-      console.log(loggedIn);
-      Promise.all([
-        api.getInitialCards(),
-        api.getUserInfo()
-      ])
-      .then(([initialCards, data]) => {
-        setCards(initialCards);
-        setCurrentUser(data);
-      })
-      .catch((err) => console.log(err));
-    }
-  }, [loggedIn]);
-  console.log(loggedIn);
 
   // useEffect(() => {
   //   if (loggedIn) {
@@ -191,7 +198,7 @@ function App() {
       .then((res) => {
         setInfoToolTipOpen(true);
         setIsSucces(true);
-        history.push('/sign-in');
+        navigate('/sign-in');
       })
       .catch((err) => {
         console.log(err);
@@ -204,9 +211,9 @@ function App() {
     apiAuth.authorize(email, password)
       .then((res) => {
         localStorage.setItem('jwt', res.token);
-        setLoggedIn(true);
+        handletokenCheck();
         setEmail(email);
-        history.push('/');
+        navigate('/');
       })
       .catch((err) => {
         console.log(err);
@@ -218,41 +225,46 @@ function App() {
   function handleSignOut() {
     localStorage.removeItem('jwt');
     setLoggedIn(false);
-    history.push('/sign-in/');
+    navigate('/sign-in/');
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
+    <CurrentUserContext.Provider value = {currentUser}>
       <div className="page">
         <Header 
+          loggedIn = {loggedIn}
           email = {email}
           onSignOut = {handleSignOut}
         />
-        <Switch>
-          <ProtectedRoute
-            exact path="/"  
-            loggedIn = {loggedIn}
-            component = {Main}
-            onEditProfile = {handleEditProfileClick}
-            onAddPlace = {handleAddPlaceClick}
-            onEditAvatar = {handleEditAvatarClick}
-            onCardClick = {handleCardClick}
-            cards = {cards}
-            onCardLike = {handleCardLike}
-            onCardDelete = {handleCardDelete}
+        <Routes>
+          <Route 
+            path = "/sign-up"
+            element = {<Register onRegister = {handleRegisterSubmit} />}
+          />
+          
+          < Route 
+            path = "/sign-in"
+            element={<Login onLogin = {handleLoginSubmit} />}
           />
 
-          <Route path="/sign-in">
-            <Login onLogin={handleLoginSubmit} />
-          </Route>
-          <Route path="/sign-up">
-            <Register onRegister={handleRegisterSubmit} />
-          </Route>
-          
-          <Route path="*">
-            { loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" /> }
-          </Route>
-        </Switch>
+          <Route
+            path = '/'
+            element = {
+              <ProtectedRoute loggedIn = {loggedIn}>
+                <Main
+                  onEditProfile = {handleEditProfileClick}
+                  onAddPlace = {handleAddPlaceClick}
+                  onEditAvatar = {handleEditAvatarClick}
+                  onCardClick = {handleCardClick}
+                  cards = {cards}
+                  onCardLike = {handleCardLike}
+                  onCardDelete = {handleCardDelete}
+                />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
         <Footer />
       </div>
 
