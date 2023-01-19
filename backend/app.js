@@ -23,7 +23,7 @@ app.use(helmet());
 //   max: 100,
 // }));
 
-mongoose.connect('mongodb://51.250.91.203:27017/mestodb');
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(requestLogger);
 
