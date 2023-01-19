@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = 'http://api.ya-mesto.nomoredomains.rocks/';
 
 const checkResponse = (res) => {
   if (res.ok) {
