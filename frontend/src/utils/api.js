@@ -86,7 +86,7 @@ class Api {
 }
 
 const api = new Api({
-    url: 'http://localhost:3001',
+    url: 'http://api.ya-mesto.nomoredomains.rocks',
     headers: {
         "Content-type": "application/json"
     }
